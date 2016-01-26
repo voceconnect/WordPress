@@ -187,7 +187,7 @@ function create_initial_post_types() {
 function get_attached_file( $attachment_id, $unfiltered = false ) {
 	$file = get_post_meta( $attachment_id, '_wp_attached_file', true );
 	// If the file is relative, prepend upload dir.
-	if ( $file && 0 !== strpos($file, '/') && !preg_match('|^.:\\\|', $file) && ( ($uploads = wp_upload_dir()) && false === $uploads['error'] ) )
+	if ( $file && 0 !== strpos($file, '/') && !preg_match('|^.:\\\|', $file) && ( ($uploads = wp_upload_dir( null, false )) && false === $uploads['error'] ) )
 		$file = $uploads['basedir'] . "/$file";
 	if ( $unfiltered )
 		return $file;
@@ -4863,7 +4863,7 @@ function wp_get_attachment_url( $post_id = 0 ) {
 	// Get attached file.
 	if ( $file = get_post_meta( $post->ID, '_wp_attached_file', true) ) {
 		// Get upload directory.
-		if ( ($uploads = wp_upload_dir()) && false === $uploads['error'] ) {
+		if ( ($uploads = wp_upload_dir( null, false ) ) && false === $uploads['error'] ) {
 			// Check that the upload base exists in the file location.
 			if ( 0 === strpos( $file, $uploads['basedir'] ) ) {
 				// Replace file location with url location.
