@@ -1556,6 +1556,11 @@ function wp_get_original_referer() {
 function wp_mkdir_p( $target ) {
 	$wrapper = null;
 
+	// Allow plugins to override dir creation.
+	$override = apply_filters( 'wp_mkdir_p_override', null, $target );
+	if ( $override !== null )
+		return $override;
+
 	// Strip the protocol.
 	if ( wp_is_stream( $target ) ) {
 		list( $wrapper, $target ) = explode( '://', $target, 2 );
@@ -1807,9 +1812,10 @@ function win_is_writable( $path ) {
  * @since 2.0.0
  *
  * @param string $time Optional. Time formatted in 'yyyy/mm'. Default null.
+ * @param bool $mkdir Optional. Attempt to create uploads directory if it doesn't exist.
  * @return array See above for description.
  */
-function wp_upload_dir( $time = null ) {
+function wp_upload_dir( $time = null, $mkdir = true ) {
 	$siteurl = get_option( 'siteurl' );
 	$upload_path = trim( get_option( 'upload_path' ) );
 
@@ -1917,7 +1923,7 @@ function wp_upload_dir( $time = null ) {
 		) );
 
 	// Make sure we have an uploads directory.
-	if ( ! wp_mkdir_p( $uploads['path'] ) ) {
+	if ( $mkdir && ! wp_mkdir_p( $uploads['path'] ) ) {
 		if ( 0 === strpos( $uploads['basedir'], ABSPATH ) )
 			$error_path = str_replace( ABSPATH, '', $uploads['basedir'] ) . $uploads['subdir'];
 		else
